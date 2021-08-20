@@ -15,7 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from usuarios.views import my_token_pair_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # JWT
+    path('api/v1/token/', my_token_pair_view, name='token_obtain_pair'),
 ]
