@@ -16,10 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from usuarios.views import my_token_pair_view
+from rest_framework_simplejwt.views import token_verify, token_refresh
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
     # JWT
     path('api/v1/token/', my_token_pair_view, name='token_obtain_pair'),
+    path('api/v1/token/refresh/', token_refresh, name='token_refresh'),
+    path('api/v1/token/verify/', token_verify, name='token_verify'),
 ]
