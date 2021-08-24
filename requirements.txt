@@ -1,7 +1,7 @@
 Django==2.2.2
 django-cors-headers==3.8.0
 django-filter==2.4.0
-djangorestframework==3.12.4
+djangorestframework==3.9.4
 djangorestframework-simplejwt==4.3.0
 importlib-metadata==4.6.4
 Markdown==3.3.4

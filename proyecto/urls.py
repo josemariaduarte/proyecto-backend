@@ -26,7 +26,8 @@ urlpatterns = [
     path('api/v1/token/refresh/', token_refresh, name='token_refresh'),
     path('api/v1/token/verify/', token_verify, name='token_verify'),
 
-# MODULOS
+    # MODULOS
     path('api/v1/usuarios/', include('usuarios.urls')),
+    path('api/v1/productos/', include('productos.urls')),
 
 ]

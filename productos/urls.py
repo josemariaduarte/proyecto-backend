@@ -8,7 +8,7 @@ from productos.views import *
 
 router = routers.DefaultRouter()
 router.register(r'sub_categoria_producto', SubCategoriaProductoViewSet)
-router.register(r'categoria_producto', CategoriaProductoViewSet)
+router.register(r'categoria', CategoriaProductoViewSet)
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
