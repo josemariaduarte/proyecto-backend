@@ -85,8 +85,8 @@ class MyRefreshToken(RefreshToken):
         token = cls()
         token[api_settings.USER_ID_CLAIM] = user_id
         token["username"] = user.username
-        token["groups"] = list(user.groups.all().values_list('name', flat=True))
-        token["is_superuser"] = user.is_superuser
+        # token["groups"] = list(user.groups.all().values_list('name', flat=True))
+        # token["is_superuser"] = user.is_superuser
         # token['rules'] = cls.get_user_permissions(user)
         return token
 
