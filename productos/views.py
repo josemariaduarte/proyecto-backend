@@ -2,7 +2,9 @@ from django.shortcuts import render
 
 # Create your views here.
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import status
 from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.response import Response
 
 from productos.models import SubCategoriaProducto, Categoria
 from productos.permissions import PermisoSubCategoriaProducto, PermisoCategoriaProducto
@@ -24,7 +26,7 @@ class SubCategoriaProductoViewSet(BaseModelViewSet):
     activate_permissions = [PermisoSubCategoriaProducto.activar_subcategoriaproducto.perm]
     inactivate_permissions = [PermisoSubCategoriaProducto.inactivar_subcategoriaproducto.perm]
     # siempre se traen solo los activos
-    queryset = SubCategoriaProducto.objects.filter(activo=True)
+    queryset = SubCategoriaProducto.objects.all()
     #
     serializer_class = SubCategoriaProductoSerializer
 
@@ -48,7 +50,7 @@ class CategoriaProductoViewSet(BaseModelViewSet):
     activate_permissions = [PermisoCategoriaProducto.activar_categoriaproducto.perm]
     inactivate_permissions = [PermisoCategoriaProducto.inactivar_categoriaproducto.perm]
     #
-    queryset = Categoria.objects.filter(activo=True)
+    queryset = Categoria.objects.all()
     #
     serializer_class = CategoriaProductoSerializer
 
