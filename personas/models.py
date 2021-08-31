@@ -1,6 +1,7 @@
 from django.db import models
 
 # Create your models here.
+from personas.permissions import PermisoProveedor
 
 
 class Persona(models.Model):
@@ -71,6 +72,7 @@ class Proveedor(models.Model):
         ordering = ['-pk']
         verbose_name = 'Proveedor'
         verbose_name_plural = 'Proveedores'
+        permissions = PermisoProveedor.get_permissions()
 
     def __str__(self):
         return '{} ({})'.format(self.razon_social, self.ruc)
