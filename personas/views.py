@@ -1,13 +1,15 @@
 from django.shortcuts import render
 # Create your views here.
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.decorators import api_view
 from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.response import Response
 
 from personas.permissions import PermisoProveedor
 from personas.serializers import ProveedorSerializer, ClienteSerializer
 from utils.paginations import GenericPagination
 from utils.views import BaseModelViewSet
-from personas.models import Proveedor, Cliente
+from personas.models import Proveedor, Cliente, Persona
 
 
 class ProveedorViewSet(BaseModelViewSet):
@@ -57,3 +59,14 @@ class ClienteViewSet(BaseModelViewSet):
     ordering_fields = ['id']
     ordering = ['-id']
     pagination_class = GenericPagination
+
+
+
+@api_view(['GET'])
+def get_sexo_choices(request):
+    return Response(dict(sexo=[{'id': choice[0], 'text': choice[1]} for choice in Persona.SEXO_CHOICES]))
+
+
+@api_view(['GET'])
+def get_estado_civil(request):
+    return Response(dict(estado_civil=[{'id': choice[0], 'text': choice[1]} for choice in Persona.ESTADO_CIVIL_CHOICES]))

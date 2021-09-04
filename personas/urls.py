@@ -13,4 +13,6 @@ router.register(r'cliente', ClienteViewSet)
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('', include(router.urls)),
+    path('sexo_choices/', get_sexo_choices, name='get_sexo_choices'),
+    path('estado_civil_choices/', get_estado_civil, name='get_estado_choices'),
 ]
