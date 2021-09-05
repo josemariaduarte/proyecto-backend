@@ -1,6 +1,7 @@
 from django.db import models
 
 # Create your models here.
+from personas.models import Proveedor
 from productos.permissions import PermisoCategoriaProducto, PermisoSubCategoriaProducto, PermisoUnidadDeMedida, \
     PermisoDeposito, PermisoProveedor, PermisoProducto
 
@@ -103,30 +104,6 @@ class Deposito(models.Model):
         return super(Deposito, self).save(*args, **kwargs)
 
 
-class Proveedor(models.Model):
-    """
-    modelo Proveedor
-    """
-
-    razon_social = models.CharField(verbose_name='Nombre o Razón Social', max_length=100)
-    ruc = models.CharField(verbose_name='RUC', max_length=20)
-    direccion = models.CharField(verbose_name='Dirección', max_length=100)
-    activo = models.BooleanField(default=True)
-
-    class Meta:
-        ordering = ['-pk']
-        verbose_name = 'Proveedor'
-        verbose_name_plural = 'Proveedores'
-        permissions = PermisoProveedor.get_permissions()
-
-    def __str__(self):
-        return '{} ({})'.format(self.razon_social, self.ruc)
-
-    def save(self, *args, **kwargs):
-        self.razon_social = self.razon_social.upper()
-        self.direccion = self.direccion.upper()
-        self.ruc = self.ruc.upper()
-        return super(Proveedor, self).save(*args, **kwargs)
 
 
 class Producto(models.Model):

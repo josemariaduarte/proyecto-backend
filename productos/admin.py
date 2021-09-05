@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from productos.models import Categoria, SubCategoriaProducto
+from productos.models import Categoria, SubCategoriaProducto, Producto
 
 @admin.register(Categoria)
 class CategoriaoAdmin(admin.ModelAdmin):
@@ -11,3 +11,9 @@ class CategoriaoAdmin(admin.ModelAdmin):
 @admin.register(SubCategoriaProducto)
 class SubCategoriaProductoAdmin(admin.ModelAdmin):
     list_display = ['id', 'nombre', 'categoria_producto', 'activo']
+
+
+@admin.register(Producto)
+class ProductoAdmin(admin.ModelAdmin):
+    list_display = ['id', 'nombre', 'precio_venta', 'activo']
+
