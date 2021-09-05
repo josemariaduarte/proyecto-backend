@@ -6,9 +6,11 @@ from rest_framework import status
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
 
-from productos.models import SubCategoriaProducto, Categoria
-from productos.permissions import PermisoSubCategoriaProducto, PermisoCategoriaProducto
-from productos.serializers import SubCategoriaProductoSerializer, CategoriaProductoSerializer
+from productos.models import SubCategoriaProducto, Categoria, UnidadDeMedida, Deposito
+from productos.permissions import PermisoSubCategoriaProducto, PermisoCategoriaProducto, PermisoUnidadDeMedida, \
+    PermisoDeposito
+from productos.serializers import SubCategoriaProductoSerializer, CategoriaProductoSerializer, UnidadDeMedidaSerializer, \
+    DepositoSerializer
 from utils.paginations import GenericPagination
 from utils.views import BaseModelViewSet
 
@@ -53,6 +55,54 @@ class CategoriaProductoViewSet(BaseModelViewSet):
     queryset = Categoria.objects.all()
     #
     serializer_class = CategoriaProductoSerializer
+
+    filter_backends = (SearchFilter, DjangoFilterBackend, OrderingFilter)
+    search_fields = ['nombre']
+    ordering_fields = ['id']
+    ordering = ['-id']
+    pagination_class = GenericPagination
+
+
+class UnidadMedidaViewSet(BaseModelViewSet):
+    """
+    API que permite crear, ver o editar Categorias de Productos
+    """
+
+    retrieve_permissions = 'view_unidadmedida'
+    list_permissions = 'view_unidadmedida'
+    update_permissions = 'change_unidadmedida'
+    create_permissions = 'add_unidadmedida'
+    destroy_permissions = 'delete_unidadmedida'
+    activate_permissions = [PermisoUnidadDeMedida.activar_unidaddemedida.perm]
+    inactivate_permissions = [PermisoUnidadDeMedida.inactivar_unidaddemedida.perm]
+    #
+    queryset = UnidadDeMedida.objects.all()
+    #
+    serializer_class = UnidadDeMedidaSerializer
+
+    filter_backends = (SearchFilter, DjangoFilterBackend, OrderingFilter)
+    search_fields = ['nombre']
+    ordering_fields = ['id']
+    ordering = ['-id']
+    pagination_class = GenericPagination
+
+
+class DepositoViewSet(BaseModelViewSet):
+    """
+    API que permite crear, ver o editar Depositos
+    """
+
+    retrieve_permissions = 'view_deposito'
+    list_permissions = 'view_deposito'
+    update_permissions = 'change_deposito'
+    create_permissions = 'add_deposito'
+    destroy_permissions = 'delete_deposito'
+    activate_permissions = [PermisoDeposito.activar_deposito.perm]
+    inactivate_permissions = [PermisoDeposito.inactivar_deposito.perm]
+    #
+    queryset = Deposito.objects.all()
+    #
+    serializer_class = DepositoSerializer
 
     filter_backends = (SearchFilter, DjangoFilterBackend, OrderingFilter)
     search_fields = ['nombre']
