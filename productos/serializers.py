@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from productos.models import SubCategoriaProducto, Categoria, UnidadDeMedida, Deposito
+from productos.models import SubCategoriaProducto, Categoria, UnidadDeMedida, Deposito, Producto
 from utils.serializers import BaseModelSerializer
 
 
@@ -47,3 +47,17 @@ class DepositoSerializer(BaseModelSerializer):
     class Meta:
         model = Deposito
         fields = ['id', 'nombre', 'descripcion', 'direccion', 'activo']
+
+
+class ProductoSerializer(BaseModelSerializer):
+    """
+    serializer de unidad de medida
+    """
+    table_columns = ['id', 'nombre']
+
+    class Meta:
+        model = Producto
+        fields = ['id', 'nombre', 'descripcion', 'proveedor',
+                  'precio_compra', 'precio_venta', 'cantidad',
+                  'cantidad_minima_stock', 'subcategoria',
+                  'deposito', 'unidad_medida']

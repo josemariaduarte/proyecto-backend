@@ -6,11 +6,11 @@ from rest_framework import status
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
 
-from productos.models import SubCategoriaProducto, Categoria, UnidadDeMedida, Deposito
+from productos.models import SubCategoriaProducto, Categoria, UnidadDeMedida, Deposito, Producto
 from productos.permissions import PermisoSubCategoriaProducto, PermisoCategoriaProducto, PermisoUnidadDeMedida, \
-    PermisoDeposito
+    PermisoDeposito, PermisoProducto
 from productos.serializers import SubCategoriaProductoSerializer, CategoriaProductoSerializer, UnidadDeMedidaSerializer, \
-    DepositoSerializer
+    DepositoSerializer, ProductoSerializer
 from utils.paginations import GenericPagination
 from utils.views import BaseModelViewSet
 
@@ -103,6 +103,30 @@ class DepositoViewSet(BaseModelViewSet):
     queryset = Deposito.objects.all()
     #
     serializer_class = DepositoSerializer
+
+    filter_backends = (SearchFilter, DjangoFilterBackend, OrderingFilter)
+    search_fields = ['nombre']
+    ordering_fields = ['id']
+    ordering = ['-id']
+    pagination_class = GenericPagination
+
+
+class ProductoViewSet(BaseModelViewSet):
+    """
+    API que permite crear, ver o editar Depositos
+    """
+
+    retrieve_permissions = 'view_producto'
+    list_permissions = 'view_producto'
+    update_permissions = 'change_producto'
+    create_permissions = 'add_producto'
+    destroy_permissions = 'delete_producto'
+    activate_permissions = [PermisoProducto.activar_producto.perm]
+    inactivate_permissions = [PermisoProducto.inactivar_producto.perm]
+    #
+    queryset = Producto.objects.all()
+    #
+    serializer_class = ProductoSerializer
 
     filter_backends = (SearchFilter, DjangoFilterBackend, OrderingFilter)
     search_fields = ['nombre']
