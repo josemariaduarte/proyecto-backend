@@ -30,9 +30,6 @@ class OrdenCompra(models.Model):
         verbose_name = 'Orden Compra'
         verbose_name_plural = 'Ordenes de Compra'
 
-    def __str__(self):
-        return self.proveedor
-
 
 class OrdenCompraDetalle(models.Model):
     """
@@ -49,8 +46,6 @@ class OrdenCompraDetalle(models.Model):
         verbose_name = 'Orden Compra Detalle'
         verbose_name_plural = 'Ordenes de Compra Detalle'
 
-    def __str__(self):
-        return self.producto
 
 
 class Compra(models.Model):
@@ -70,7 +65,8 @@ class Compra(models.Model):
 
     proveedor = models.ForeignKey(Proveedor, on_delete=models.PROTECT)
     tipo_comprobante = models.IntegerField(choices=TIPO_COMPROBANTE_CHOICES, default=FACTURA)
-    numero_comprobante = models.CharField(max_length=100, verbose_name='Numero Comprobante')
+    numero_comprobante = models.CharField(max_length=100, verbose_name='Numero Comprobante', blank=True, null=True)
+    fecha = models.DateField(default=timezone.now, verbose_name='Fecha')
     impuesto = models.IntegerField(choices=IMPUESTO_CHOICES, blank=True, null=True)
     total = models.FloatField(verbose_name='Total', default=0)
     orden_compra = models.ForeignKey(OrdenCompra, on_delete=models.PROTECT, blank=True, null=True)

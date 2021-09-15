@@ -28,7 +28,11 @@ urlpatterns = [
 
     # MODULOS
     path('api/v1/usuarios/', include('usuarios.urls')),
+
     path('api/v1/productos/', include('productos.urls')),
+
     path('api/v1/personas/', include('personas.urls')),
+
+    path('api/v1/movimientos/', include('movimientos.urls')),
 
 ]
