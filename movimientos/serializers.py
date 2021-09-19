@@ -20,11 +20,13 @@ class OrdenCompraSerializer(BaseModelSerializer):
     serializer de orden de compra
     """
     detalles = OrdenCompraDetalleSerializer(many=True, source='ordencompradetalle_set', required=False)
-    table_columns = ['id', 'nombre']
+    estado = serializers.CharField(source='get_estado_display', required=False)
+    proveedor_name = serializers.CharField(source='proveedor.razon_social', required=False)
+    table_columns = ['fecha']
 
     class Meta:
         model = OrdenCompra
-        fields = ['id', 'proveedor', 'fecha', 'detalles']
+        fields = ['id', 'proveedor', 'proveedor_name', 'fecha', 'estado', 'detalles']
 
     @transaction.atomic
     def create(self, validated_data):
