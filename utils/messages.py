@@ -16,4 +16,5 @@ class Success:
     ACTIVADO: str = 'Registro activado correctamente.'
     INACTIVADO: str = 'Registro inactivado correctamente.'
     ORDEN_APROBADO: str = 'Orden de Compra Aprobado'
+    ORDEN_RECHAZADO: str = 'Orden de Compra Rechazado'
 

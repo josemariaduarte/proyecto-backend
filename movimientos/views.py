@@ -58,3 +58,12 @@ class OrdenCompraViewSet(BaseModelViewSet):
                                          precio=detalle.precio
                                          )
         return Response(dict(message=Success.ORDEN_APROBADO), status=status.HTTP_200_OK)
+
+
+    @detail_route(methods=['post'])
+    @transaction.atomic
+    def rechazar(self, request, pk=None):
+        instance = self.get_object()
+        instance.estado = OrdenCompra.RECHAZADO
+        instance.save()
+        return Response(dict(message=Success.ORDEN_APROBADO), status=status.HTTP_200_OK)
