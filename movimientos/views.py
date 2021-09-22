@@ -10,7 +10,7 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from movimientos.models import OrdenCompra, Compra, OrdenCompraDetalle, CompraDetalle
 from movimientos.permissions import PermisoOrdenCompra
-from movimientos.serializers import OrdenCompraSerializer
+from movimientos.serializers import OrdenCompraSerializer, CompraSerializer
 from utils.messages import Success
 from utils.paginations import GenericPagination
 from utils.views import BaseModelViewSet
@@ -67,3 +67,28 @@ class OrdenCompraViewSet(BaseModelViewSet):
         instance.estado = OrdenCompra.RECHAZADO
         instance.save()
         return Response(dict(message=Success.ORDEN_APROBADO), status=status.HTTP_200_OK)
+
+
+class CompraViewSet(BaseModelViewSet):
+    """
+    API que permite crear, ver o editar Ordenes de Compra
+    """
+
+    retrieve_permissions = 'view_compra'
+    list_permissions = 'view_compra'
+    update_permissions = 'change_compra'
+    create_permissions = 'add_compra'
+    destroy_permissions = 'delete_compra'
+    # quitamos activar e inactivar por que no lo vamos a usar de manera momentanea
+    # activate_permissions = [PermisoOrdenCompra.activar_orden_compra.perm]
+    # inactivate_permissions = [PermisoOrdenCompra.inactivar_orden_compra.perm]
+    #
+    queryset = Compra.objects.all()
+    #
+    serializer_class = CompraSerializer
+
+    filter_backends = (SearchFilter, DjangoFilterBackend, OrderingFilter)
+    search_fields = ['proveedor']
+    ordering_fields = ['id']
+    ordering = ['-id']
+    pagination_class = GenericPagination

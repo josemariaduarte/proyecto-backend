@@ -10,5 +10,3 @@ class PermisoOrdenCompra(PermisoEnum):
 
 
 PermisoOrdenCompra.app_name = 'movimientos'
-
-

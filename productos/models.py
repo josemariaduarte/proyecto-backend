@@ -123,7 +123,7 @@ class Producto(models.Model):
     subcategoria = models.ForeignKey(SubCategoriaProducto, on_delete=models.PROTECT)
     deposito = models.ForeignKey(Deposito, on_delete=models.PROTECT)
     unidad_medida = models.ForeignKey(UnidadDeMedida, on_delete=models.PROTECT)
-
+    porcentaje_ganancia = models.FloatField(verbose_name='Porcentaje Ganancia', default=0)
     activo = models.BooleanField(default=True)
 
     class Meta:
