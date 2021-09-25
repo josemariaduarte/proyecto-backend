@@ -62,12 +62,12 @@ class CompraSerializer(BaseModelSerializer):
     serializer de orden de compra
     """
     detalles = CompraDetalleSerializer(many=True, source='compradetalle_set', required=False)
-
+    proveedor_name = serializers.CharField(source='proveedor.razon_social', required=False)
     table_columns = ['fecha']
 
     class Meta:
         model = Compra
-        fields = ['id', 'proveedor', 'tipo_comprobante', 'numero_comprobante', 'impuesto', 'total', 'fecha', 'detalles']
+        fields = ['id', 'proveedor', 'proveedor_name', 'tipo_comprobante', 'numero_comprobante', 'impuesto', 'total', 'fecha', 'detalles']
 
     def producto_actualizar(self, detail):
         '''

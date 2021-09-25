@@ -47,7 +47,6 @@ class OrdenCompraDetalle(models.Model):
         verbose_name_plural = 'Ordenes de Compra Detalle'
 
 
-
 class Compra(models.Model):
     """
     modelo Compra

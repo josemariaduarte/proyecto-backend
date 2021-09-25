@@ -4,7 +4,7 @@ from django.shortcuts import render
 # Create your views here.
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import detail_route, api_view
 from rest_framework.filters import SearchFilter
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -92,3 +92,23 @@ class CompraViewSet(BaseModelViewSet):
     ordering_fields = ['id']
     ordering = ['-id']
     pagination_class = GenericPagination
+
+
+
+@api_view(['GET'])
+def get_tipo_comprobante_choices(request):
+    return Response(dict(tipo_comprobante=[{'id': choice[0], 'text': choice[1]} for choice in Compra.TIPO_COMPROBANTE_CHOICES]))
+
+
+@api_view(['GET'])
+def get_impuesto_choices(request):
+    return Response(dict(impuesto=[{'id': choice[0], 'text': choice[1]} for choice in Compra.IMPUESTO_CHOICES]))
+
+
+
+
+
+
+
+
+
