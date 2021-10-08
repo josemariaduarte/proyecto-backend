@@ -9,9 +9,9 @@ from rest_framework.decorators import detail_route, api_view
 from rest_framework.filters import SearchFilter
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from movimientos.models import OrdenCompra, Compra, OrdenCompraDetalle, CompraDetalle
+from movimientos.models import OrdenCompra, Compra, OrdenCompraDetalle, CompraDetalle, Venta
 from movimientos.permissions import PermisoOrdenCompra
-from movimientos.serializers import OrdenCompraSerializer, CompraSerializer
+from movimientos.serializers import OrdenCompraSerializer, CompraSerializer, VentaSerializer
 from productos.models import TransaccionProducto
 from utils.messages import Success, Error, Info
 from utils.paginations import GenericPagination
@@ -130,6 +130,29 @@ def get_impuesto_choices(request):
 
 
 
+class VentaViewSet(BaseModelViewSet):
+    """
+    API que permite crear, ver o editar ventas
+    """
+
+    retrieve_permissions = 'view_venta'
+    list_permissions = 'view_venta'
+    update_permissions = 'change_venta'
+    create_permissions = 'add_venta'
+    destroy_permissions = 'delete_venta'
+    # quitamos activar e inactivar por que no lo vamos a usar de manera momentanea
+    # activate_permissions = [PermisoOrdenCompra.activar_orden_compra.perm]
+    # inactivate_permissions = [PermisoOrdenCompra.inactivar_orden_compra.perm]
+    #
+    queryset = Venta.objects.filter(activo=True)
+    #
+    serializer_class = VentaSerializer
+
+    filter_backends = (SearchFilter, DjangoFilterBackend, OrderingFilter)
+    search_fields = ['cliente']
+    ordering_fields = ['id']
+    ordering = ['-id']
+    pagination_class = GenericPagination
 
 
 

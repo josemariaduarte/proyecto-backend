@@ -4,7 +4,7 @@ from django.db import models
 # Create your models here.
 from django.utils import timezone
 
-from personas.models import Proveedor
+from personas.models import Proveedor, Cliente
 from productos.models import Producto
 
 
@@ -93,6 +93,56 @@ class CompraDetalle(models.Model):
         ordering = ['-pk']
         verbose_name = 'Compra Detalle'
         verbose_name_plural = 'Compra Detalle'
+
+    def __str__(self):
+        return self.producto
+
+
+class Venta(models.Model):
+    """
+    modelo Venta
+    """
+    TICKET = 1
+    FACTURA = 2
+    TIPO_COMPROBANTE_CHOICES = (
+        (TICKET, 'TICKET'),
+        (FACTURA, 'FACTURA')
+    )
+    IMPUESTO_CHOICES = (
+        (5, '5%'),
+        (10, '10%')
+    )
+
+    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
+    tipo_comprobante = models.IntegerField(choices=TIPO_COMPROBANTE_CHOICES, default=FACTURA)
+    numero_comprobante = models.CharField(max_length=100, verbose_name='Numero Comprobante', blank=True, null=True)
+    fecha = models.DateField(default=timezone.now, verbose_name='Fecha')
+    impuesto = models.IntegerField(choices=IMPUESTO_CHOICES, blank=True, null=True)
+    total = models.FloatField(verbose_name='Total', default=0)
+
+    activo = models.BooleanField(default=True)
+    usuario = models.ForeignKey(User, on_delete=models.PROTECT)
+
+    class Meta:
+        ordering = ['-pk']
+        verbose_name = 'Compra'
+        verbose_name_plural = 'Compras'
+
+
+class VentaDetalle(models.Model):
+    """
+    modelo  Venta Detalle
+    """
+    venta = models.ForeignKey(Venta, on_delete=models.PROTECT)
+    producto = models.ForeignKey(Producto, on_delete=models.PROTECT)
+    cantidad = models.FloatField(verbose_name='Cantidad')
+    precio = models.FloatField(verbose_name='Precio')
+    precio_venta = models.FloatField(verbose_name='Precio Venta')
+
+    class Meta:
+        ordering = ['-pk']
+        verbose_name = 'Venta Detalle'
+        verbose_name_plural = 'Ventas Detalle'
 
     def __str__(self):
         return self.producto

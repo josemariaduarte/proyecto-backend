@@ -3,7 +3,7 @@ from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.utils import model_meta
 
-from movimientos.models import OrdenCompra, OrdenCompraDetalle, CompraDetalle, Compra
+from movimientos.models import OrdenCompra, OrdenCompraDetalle, CompraDetalle, Compra, VentaDetalle, Venta
 from productos.models import TransaccionProducto
 from utils.functions import list_diff
 from utils.serializers import BaseModelSerializer
@@ -184,13 +184,62 @@ class CompraSerializer(BaseModelSerializer):
             obj.delete()
 
 
+class VentaDetalleSerializer(BaseModelSerializer):
+    """
+    serializer de detalle de venta
+    """
+    table_columns = []
+
+    class Meta:
+        model = VentaDetalle
+        fields = ['id', 'producto', 'cantidad', 'precio']
 
 
+class VentaSerializer(BaseModelSerializer):
+    """
+    serializer de ventas
+    """
+    detalles = VentaDetalleSerializer(many=True, source='ventadetalle_set', required=True)
+    cliente_name = serializers.CharField(source='cliente.nombres', required=False)
+    table_columns = ['fecha']
+
+    class Meta:
+        model = Venta
+        fields = ['id', 'cliente', 'cliente_name', 'tipo_comprobante', 'numero_comprobante', 'impuesto', 'total',
+                  'fecha', 'detalles', 'activo']
+
+    def producto_actualizar(self, detail):
+        '''
+        permite actualizar datos del producto
+        :param detail: detalle de venta
+        :return: true
+        '''
+        producto = detail['producto']
+        producto.cantidad = producto.cantidad - float(detail['cantidad'])
+        producto.save()
 
 
-
-
-
-
+    @transaction.atomic
+    def create(self, validated_data):
+        k = 'compradetalle_set'
+        detalles = validated_data.pop(k, [])
+        if k in validated_data:
+            del validated_data[k]
+        validated_data['usuario'] = self.context['request'].user
+        venta = super(VentaSerializer, self).create(validated_data)
+        monto = 0
+        for detalle in detalles:
+            VentaDetalle.objects.create(venta=venta,
+                                        producto=detalle['producto'],
+                                        cantidad=detalle['cantidad'],
+                                        precio=detalle['producto'].precio_venta,
+                                        precio_venta=detalle['precio']) # corresponde al precio que al final se vende
+            monto += (detalle['cantidad'] * detalle['precio'])
+            self.producto_actualizar(detalle)
+        #
+        venta.total = monto
+        venta.save()
+        #
+        return venta
 
 
