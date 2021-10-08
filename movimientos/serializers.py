@@ -87,7 +87,7 @@ class CompraSerializer(BaseModelSerializer):
         # si se cambio el precio de compra entonces se actualizan los precios
         if producto.precio_compra != float(detail['precio']):
             producto.precio_compra = float(detail['precio'])
-            producto.precio_venta += float(detail['precio']) * (producto.porcentaje_ganancia/100)
+            producto.precio_venta = float(detail['precio']) + (float(detail['precio']) * (producto.porcentaje_ganancia/100))
             producto.fecha_modificacion_precio_venta = timezone.now()
             # creamos la transaccion producto
         producto.save()
