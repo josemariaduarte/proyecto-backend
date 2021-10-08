@@ -12,6 +12,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from movimientos.models import OrdenCompra, Compra, OrdenCompraDetalle, CompraDetalle
 from movimientos.permissions import PermisoOrdenCompra
 from movimientos.serializers import OrdenCompraSerializer, CompraSerializer
+from productos.models import TransaccionProducto
 from utils.messages import Success, Error, Info
 from utils.paginations import GenericPagination
 from utils.views import BaseModelViewSet
@@ -84,7 +85,7 @@ class CompraViewSet(BaseModelViewSet):
     # activate_permissions = [PermisoOrdenCompra.activar_orden_compra.perm]
     # inactivate_permissions = [PermisoOrdenCompra.inactivar_orden_compra.perm]
     #
-    queryset = Compra.objects.all()
+    queryset = Compra.objects.filter(activo=True)
     #
     serializer_class = CompraSerializer
 
@@ -106,8 +107,11 @@ class CompraViewSet(BaseModelViewSet):
 
         obj.activo = False
         obj.save()
-        # descontamos del stock del producto
-
+        # descontamos el stock del prodcuto
+        for detail in CompraDetalle.objects.filter(compra=obj):
+            producto = detail.producto
+            producto.cantidad = producto.cantidad - detail.cantidad
+            producto.save()
         return Response(dict(message=Success.INACTIVADO), status=status.HTTP_200_OK)
 
 

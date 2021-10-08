@@ -70,7 +70,8 @@ class CompraSerializer(BaseModelSerializer):
 
     class Meta:
         model = Compra
-        fields = ['id', 'proveedor', 'proveedor_name', 'tipo_comprobante', 'numero_comprobante', 'impuesto', 'total', 'fecha', 'detalles']
+        fields = ['id', 'proveedor', 'proveedor_name', 'tipo_comprobante', 'numero_comprobante', 'impuesto', 'total',
+                  'fecha', 'detalles', 'activo']
 
     def producto_actualizar(self, detail):
         '''
@@ -169,14 +170,15 @@ class CompraSerializer(BaseModelSerializer):
                         # solo si se modifico el precio
                         if producto.precio_compra != float(value):
                             producto.precio_compra = float(value)
-                            producto.precio_venta += float(value) * (producto.porcentaje_ganancia / 100)
+                            producto.precio_venta = float(value) + float(value) * (producto.porcentaje_ganancia / 100)
                             producto.fecha_modificacion_precio_venta = timezone.now()
                             producto.save()
                     setattr(obj, attr, value)
                 obj.save()
         #
         for data in nuevos:
-            CompraDetalle.objects.create(compra=compra, **data)
+            detail = CompraDetalle.objects.create(compra=compra, **data)
+            self.producto_actualizar(detail)
         #
         for obj in queryset.filter(pk__in=eliminados):
             obj.delete()
