@@ -160,6 +160,7 @@ class TransaccionProducto(models.Model):
     cantidad_actual = models.FloatField('Cantidad Actual en Stock')
     precio_compra = models.FloatField(verbose_name='Precio Compra')
     precio_compra_anterior = models.FloatField(verbose_name='Precio Compra Anterior')
+    precio_venta_anterior = models.FloatField(verbose_name='Precio Venta Anterior', default=0)
     precio_venta = models.FloatField(verbose_name='Precio Venta Anterior')
 
     class Meta:

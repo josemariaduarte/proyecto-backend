@@ -4,6 +4,7 @@ from rest_framework import serializers
 from rest_framework.utils import model_meta
 
 from movimientos.models import OrdenCompra, OrdenCompraDetalle, CompraDetalle, Compra
+from productos.models import TransaccionProducto
 from utils.functions import list_diff
 from utils.serializers import BaseModelSerializer
 
@@ -78,14 +79,29 @@ class CompraSerializer(BaseModelSerializer):
         :return: true
         '''
         producto = detail['producto']
+        cantidad_anterior = producto.cantidad
+        precio_compra_anterior = producto.precio_compra
+        precio_venta_anterior = producto.precio_venta
         producto.cantidad = producto.cantidad + detail['cantidad']
         producto.fecha_ultima_compra = timezone.now()
         # si se cambio el precio de compra entonces se actualizan los precios
-        if producto.precio_compra != detail['precio']:
-            producto.precio_compra = detail['precio']
-            producto.precio_venta += detail['precio'] * (producto.porcentaje_ganancia/100)
+        if producto.precio_compra != float(detail['precio']):
+            producto.precio_compra = float(detail['precio'])
+            producto.precio_venta += float(detail['precio']) * (producto.porcentaje_ganancia/100)
             producto.fecha_modificacion_precio_venta = timezone.now()
+            # creamos la transaccion producto
         producto.save()
+        #
+        TransaccionProducto.objects.create(
+            producto=detail['producto'],
+            cantidad=float(detail['cantidad']),
+            cantidad_anterior=cantidad_anterior,
+            cantidad_actual=producto.cantidad,
+            precio_compra_anterior=precio_compra_anterior,
+            precio_compra=producto.precio_compra,
+            precio_venta_anterior=precio_venta_anterior,
+            precio_venta=producto.precio_venta
+        )
 
 
 
