@@ -2,6 +2,7 @@ from django.db import transaction
 from django.shortcuts import render
 
 # Create your views here.
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import detail_route, api_view
@@ -11,7 +12,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from movimientos.models import OrdenCompra, Compra, OrdenCompraDetalle, CompraDetalle
 from movimientos.permissions import PermisoOrdenCompra
 from movimientos.serializers import OrdenCompraSerializer, CompraSerializer
-from utils.messages import Success
+from utils.messages import Success, Error, Info
 from utils.paginations import GenericPagination
 from utils.views import BaseModelViewSet
 
@@ -92,6 +93,22 @@ class CompraViewSet(BaseModelViewSet):
     ordering_fields = ['id']
     ordering = ['-id']
     pagination_class = GenericPagination
+
+    @detail_route(methods=['post'])
+    def inactivar(self, request, pk=None):
+        if not request.user.has_perms(self.inactivate_permissions):
+            raise ValidationError(dict(detail=Error.NO_TIENE_PERMISO))
+        obj = self.get_object()
+        if not hasattr(obj, 'activo'):
+            raise ValidationError(dict(detail=Error.NO_TIENE_CAMPO_ACTIVO))
+        if obj.activo == "N" or (obj.activo is not True and obj.activo != "S"):
+            raise ValidationError(dict(detail=Info.INACTIVO))
+
+        obj.activo = False
+        obj.save()
+        # descontamos del stock del producto
+
+        return Response(dict(message=Success.INACTIVADO), status=status.HTTP_200_OK)
 
 
 

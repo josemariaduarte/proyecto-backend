@@ -140,3 +140,29 @@ class Producto(models.Model):
         if self.descripcion:
             self.descripcion = self.descripcion.upper()
         return super(Producto, self).save(*args, **kwargs)
+
+
+class TransaccionProducto(models.Model):
+    """
+    modelo para guardar los movimientos de un producto en compra/venta y el manejo de las cantidades y precios
+    como un historico
+    """
+    COMPRA = 1
+    VENTA = 2
+    TIPO_TRANSACCION_PRODUCTO = (
+        ('COMPRA', COMPRA),
+        ('VENTA', VENTA),
+    )
+    producto = models.ForeignKey(Producto, on_delete=models.PROTECT)
+    tipo = models.IntegerField(verbose_name='Tipo', choices=TIPO_TRANSACCION_PRODUCTO, default=COMPRA)
+    cantidad = models.FloatField('Cantidad')
+    cantidad_anterior = models.FloatField('Cantidad Anterior en Stock')
+    cantidad_actual = models.FloatField('Cantidad Actual en Stock')
+    precio_compra = models.FloatField(verbose_name='Precio Compra')
+    precio_compra_anterior = models.FloatField(verbose_name='Precio Compra Anterior')
+    precio_venta = models.FloatField(verbose_name='Precio Venta Anterior')
+
+    class Meta:
+        ordering = ['-pk']
+        verbose_name = 'Transacción Producto'
+        verbose_name_plural = 'Transacciones de Producto'
