@@ -9,7 +9,7 @@ from rest_framework.decorators import detail_route, api_view
 from rest_framework.filters import SearchFilter
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from movimientos.models import OrdenCompra, Compra, OrdenCompraDetalle, CompraDetalle, Venta
+from movimientos.models import OrdenCompra, Compra, OrdenCompraDetalle, CompraDetalle, Venta, VentaDetalle
 from movimientos.permissions import PermisoOrdenCompra
 from movimientos.serializers import OrdenCompraSerializer, CompraSerializer, VentaSerializer
 from productos.models import TransaccionProducto
@@ -153,6 +153,27 @@ class VentaViewSet(BaseModelViewSet):
     ordering_fields = ['id']
     ordering = ['-id']
     pagination_class = GenericPagination
+
+    @detail_route(methods=['post'])
+    @transaction.atomic
+    def inactivar(self, request, pk=None):
+        if not request.user.has_perms(self.inactivate_permissions):
+            raise ValidationError(dict(detail=Error.NO_TIENE_PERMISO))
+        obj = self.get_object()
+        if not hasattr(obj, 'activo'):
+            raise ValidationError(dict(detail=Error.NO_TIENE_CAMPO_ACTIVO))
+        if obj.activo == "N" or (obj.activo is not True and obj.activo != "S"):
+            raise ValidationError(dict(detail=Info.INACTIVO))
+
+        obj.activo = False
+        obj.save()
+        # descontamos el stock del prodcuto
+        for detail in VentaDetalle.objects.filter(venta=obj):
+            # volvemos a sumar el stock
+            producto = detail.producto
+            producto.cantidad = producto.cantidad + detail.cantidad
+            producto.save()
+        return Response(dict(message=Success.INACTIVADO), status=status.HTTP_200_OK)
 
 
 
