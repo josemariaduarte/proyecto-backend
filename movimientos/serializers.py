@@ -200,7 +200,7 @@ class VentaSerializer(BaseModelSerializer):
     serializer de ventas
     """
     detalles = VentaDetalleSerializer(many=True, source='ventadetalle_set', required=True)
-    cliente_name = serializers.CharField(source='cliente.nombres', required=False)
+    cliente_name = serializers.ReadOnlyField()
     table_columns = ['fecha']
 
     class Meta:
@@ -221,7 +221,7 @@ class VentaSerializer(BaseModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        k = 'compradetalle_set'
+        k = 'ventadetalle_set'
         detalles = validated_data.pop(k, [])
         if k in validated_data:
             del validated_data[k]

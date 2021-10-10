@@ -128,6 +128,11 @@ class Venta(models.Model):
         verbose_name = 'Compra'
         verbose_name_plural = 'Compras'
 
+    @property
+    def cliente_name(self):
+        return self.cliente.get_full_name
+
+
 
 class VentaDetalle(models.Model):
     """

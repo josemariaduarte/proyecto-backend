@@ -40,7 +40,7 @@ class Persona(models.Model):
         abstract = True
 
     def get_full_name(self):
-        return "%s - %s" % (self.nombres, self.apellidos)
+        return "%s %s" % (self.nombres, self.apellidos)
 
 
 class Cliente(Persona):
