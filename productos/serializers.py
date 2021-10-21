@@ -57,7 +57,11 @@ class ProductoSerializer(BaseModelSerializer):
 
     class Meta:
         model = Producto
-        fields = ['id', 'nombre', 'descripcion', 'proveedor',
-                  'precio_compra', 'precio_venta', 'cantidad',
-                  'cantidad_minima_stock', 'subcategoria',
-                  'deposito', 'unidad_medida']
+        fields = ['id',
+                  'nombre',
+                  'descripcion',
+                  'proveedor',
+                  'cantidad_minima_stock',
+                  'subcategoria',
+                  'deposito',
+                  'unidad_medida']

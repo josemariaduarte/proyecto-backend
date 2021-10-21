@@ -116,9 +116,9 @@ class Producto(models.Model):
     fecha_ultima_compra = models.DateTimeField(verbose_name='Fecha Última Compra', blank=True, null=True)
     fecha_modificacion_precio_venta = models.DateTimeField(verbose_name='Fecha Modificación Precio Venta',
                                                            blank=True, null=True)
-    precio_compra = models.FloatField(verbose_name='Precio Compra')
-    precio_venta = models.FloatField(verbose_name='Precio Venta')
-    cantidad = models.FloatField(verbose_name='Cantidad')
+    precio_compra = models.FloatField(verbose_name='Precio Compra', default=0)
+    precio_venta = models.FloatField(verbose_name='Precio Venta', default=0)
+    cantidad = models.FloatField(verbose_name='Cantidad', default=0)
     cantidad_minima_stock = models.FloatField(verbose_name='Cantidad Minima Stock')
     subcategoria = models.ForeignKey(SubCategoriaProducto, on_delete=models.PROTECT)
     deposito = models.ForeignKey(Deposito, on_delete=models.PROTECT)

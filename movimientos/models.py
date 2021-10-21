@@ -57,16 +57,17 @@ class Compra(models.Model):
         (TICKET, 'TICKET'),
         (FACTURA, 'FACTURA')
     )
-    IMPUESTO_CHOICES = (
-        (5, '5%'),
-        (10, '10%')
+    CONTADO = 1
+    CREDITO = 2
+    CONDICION_COMPRA_CHOICES = (
+        (CONTADO, 'CONTADO'),
+        (CREDITO, 'CREDITO')
     )
-
+    condicion = models.IntegerField(choices=CONDICION_COMPRA_CHOICES, default=CONTADO)
     proveedor = models.ForeignKey(Proveedor, on_delete=models.PROTECT)
     tipo_comprobante = models.IntegerField(choices=TIPO_COMPROBANTE_CHOICES, default=FACTURA)
     numero_comprobante = models.CharField(max_length=100, verbose_name='Numero Comprobante', blank=True, null=True)
     fecha = models.DateField(default=timezone.now, verbose_name='Fecha')
-    impuesto = models.IntegerField(choices=IMPUESTO_CHOICES, blank=True, null=True)
     total = models.FloatField(verbose_name='Total', default=0)
     orden_compra = models.ForeignKey(OrdenCompra, on_delete=models.PROTECT, blank=True, null=True)
 
@@ -83,6 +84,12 @@ class CompraDetalle(models.Model):
     """
     modelo  Compra Detalle
     """
+    IMPUESTO_CHOICES = (
+        (5, '5%'),
+        (10, '10%'),
+        (0, 'EXCENTA')
+    )
+    impuesto = models.IntegerField(choices=IMPUESTO_CHOICES, default=10)
     compra = models.ForeignKey(Compra, on_delete=models.PROTECT)
     producto = models.ForeignKey(Producto, on_delete=models.PROTECT)
     cantidad = models.FloatField(verbose_name='Cantidad')
