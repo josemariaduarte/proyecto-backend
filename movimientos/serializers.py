@@ -70,8 +70,15 @@ class CompraSerializer(BaseModelSerializer):
 
     class Meta:
         model = Compra
-        fields = ['id', 'proveedor', 'proveedor_name', 'tipo_comprobante', 'numero_comprobante', 'impuesto', 'total',
-                  'fecha', 'detalles', 'activo']
+        fields = ['id',
+                  'proveedor',
+                  'proveedor_name',
+                  'tipo_comprobante',
+                  'numero_comprobante',
+                  'total',
+                  'fecha',
+                  'detalles',
+                  'activo']
 
     def producto_actualizar(self, detail):
         '''

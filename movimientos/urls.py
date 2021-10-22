@@ -17,4 +17,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path('tipo_comprobante_choices/', get_tipo_comprobante_choices, name='get_tipo_comprobante_choices'),
     path('impuesto_choices/', get_impuesto_choices, name='get_impuesto_choices'),
+    path('condicion_choices/', get_condicion_choices, name='get_condicion_choices'),
 ]

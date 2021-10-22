@@ -122,8 +122,13 @@ def get_tipo_comprobante_choices(request):
 
 
 @api_view(['GET'])
+def get_condicion_choices(request):
+    return Response(dict(condicion=[{'id': choice[0], 'text': choice[1]} for choice in Compra.CONDICION_COMPRA_CHOICES]))
+
+
+@api_view(['GET'])
 def get_impuesto_choices(request):
-    return Response(dict(impuesto=[{'id': choice[0], 'text': choice[1]} for choice in Compra.IMPUESTO_CHOICES]))
+    return Response(dict(impuesto=[{'id': choice[0], 'text': choice[1]} for choice in CompraDetalle.IMPUESTO_CHOICES]))
 
 
 
