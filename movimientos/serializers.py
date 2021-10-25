@@ -57,7 +57,7 @@ class CompraDetalleSerializer(BaseModelSerializer):
 
     class Meta:
         model = CompraDetalle
-        fields = ['id', 'producto', 'cantidad', 'precio']
+        fields = ['id', 'producto', 'cantidad', 'precio', 'impuesto']
 
 
 class CompraSerializer(BaseModelSerializer):
@@ -87,9 +87,6 @@ class CompraSerializer(BaseModelSerializer):
         :return: true
         '''
         producto = detail['producto']
-        cantidad_anterior = producto.cantidad
-        precio_compra_anterior = producto.precio_compra
-        precio_venta_anterior = producto.precio_venta
         producto.cantidad = producto.cantidad + detail['cantidad']
         producto.fecha_ultima_compra = timezone.now()
         # si se cambio el precio de compra entonces se actualizan los precios
@@ -99,23 +96,14 @@ class CompraSerializer(BaseModelSerializer):
             producto.fecha_modificacion_precio_venta = timezone.now()
             # creamos la transaccion producto
         producto.save()
-        #
-        TransaccionProducto.objects.create(
-            producto=detail['producto'],
-            cantidad=float(detail['cantidad']),
-            cantidad_anterior=cantidad_anterior,
-            cantidad_actual=producto.cantidad,
-            precio_compra_anterior=precio_compra_anterior,
-            precio_compra=producto.precio_compra,
-            precio_venta_anterior=precio_venta_anterior,
-            precio_venta=producto.precio_venta
-        )
-
 
 
     @transaction.atomic
     def create(self, validated_data):
         k = 'compradetalle_set'
+        iva10 =0
+        iva5=0
+        ivaEx = 0
         detalles = validated_data.pop(k, [])
         if k in validated_data:
             del validated_data[k]
@@ -126,8 +114,18 @@ class CompraSerializer(BaseModelSerializer):
             CompraDetalle.objects.create(compra=compra, **detalle)
             monto += (detalle['cantidad'] * detalle['precio'])
             self.producto_actualizar(detalle)
+            # evaluamos el iva
+            if detalle['impuesto'] == 10:
+                iva10 += ((detalle['cantidad'] * detalle['precio'])*(10/100))
+            elif detalle['impuesto'] == 5:
+                iva5 += ((detalle['cantidad'] * detalle['precio'])*(5/100))
+            else:
+                ivaEx += (detalle['cantidad'] * detalle['precio'])
         #
         compra.total = monto
+        compra.total_iva5 = iva5
+        compra.total_iva10 = iva10
+        compra.total_excenta = ivaEx
         compra.save()
         #
         return compra

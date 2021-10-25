@@ -70,7 +70,10 @@ class Compra(models.Model):
     fecha = models.DateField(default=timezone.now, verbose_name='Fecha')
     total = models.FloatField(verbose_name='Total', default=0)
     orden_compra = models.ForeignKey(OrdenCompra, on_delete=models.PROTECT, blank=True, null=True)
-
+    total_iva5 = models.FloatField(verbose_name="Total IVA 5%", default=0)
+    total_iva10 = models.FloatField(verbose_name="Total IVA 10%", default=0)
+    total_excenta = models.FloatField(verbose_name="Total Excenta", default=0)
+    #
     activo = models.BooleanField(default=True)
     usuario = models.ForeignKey(User, on_delete=models.PROTECT)
 
