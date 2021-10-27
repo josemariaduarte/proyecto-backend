@@ -78,7 +78,11 @@ class CompraSerializer(BaseModelSerializer):
                   'total',
                   'fecha',
                   'detalles',
-                  'activo']
+                  'total_iva5',
+                  'total_iva10',
+                  'total_excenta',
+                  'activo'
+                  ]
 
     def producto_actualizar(self, detail):
         '''
