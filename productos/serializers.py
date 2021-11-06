@@ -61,6 +61,7 @@ class ProductoSerializer(BaseModelSerializer):
                   'nombre',
                   'descripcion',
                   'proveedor',
+                  'cantidad',
                   'cantidad_minima_stock',
                   'subcategoria',
                   'deposito',

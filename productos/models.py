@@ -133,7 +133,7 @@ class Producto(models.Model):
         permissions = PermisoProducto.get_permissions()
 
     def __str__(self):
-        return '{} ({})'.format(self.nombre, self.cantidad)
+        return '%s - %s' % (self.pk, self.nombre)
 
     def save(self, *args, **kwargs):
         self.nombre = self.nombre.upper()
