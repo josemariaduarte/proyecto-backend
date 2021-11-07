@@ -122,32 +122,46 @@ class Venta(models.Model):
         (5, '5%'),
         (10, '10%')
     )
-
+    CONTADO = 1
+    CREDITO = 2
+    CONDICION_VENTA_CHOICES = (
+        (CONTADO, 'CONTADO'),
+        (CREDITO, 'CREDITO')
+    )
+    condicion = models.IntegerField(choices=CONDICION_VENTA_CHOICES, default=CONTADO)
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
     tipo_comprobante = models.IntegerField(choices=TIPO_COMPROBANTE_CHOICES, default=FACTURA)
     numero_comprobante = models.CharField(max_length=100, verbose_name='Numero Comprobante', blank=True, null=True)
     fecha = models.DateField(default=timezone.now, verbose_name='Fecha')
     impuesto = models.IntegerField(choices=IMPUESTO_CHOICES, blank=True, null=True)
     total = models.FloatField(verbose_name='Total', default=0)
+    total_iva5 = models.FloatField(verbose_name="Total IVA 5%", default=0)
+    total_iva10 = models.FloatField(verbose_name="Total IVA 10%", default=0)
+    total_excenta = models.FloatField(verbose_name="Total Excenta", default=0)
 
     activo = models.BooleanField(default=True)
     usuario = models.ForeignKey(User, on_delete=models.PROTECT)
 
     class Meta:
         ordering = ['-pk']
-        verbose_name = 'Compra'
-        verbose_name_plural = 'Compras'
+        verbose_name = 'Venta'
+        verbose_name_plural = 'Ventas'
 
     @property
     def cliente_name(self):
         return self.cliente.get_full_name
 
 
-
 class VentaDetalle(models.Model):
     """
     modelo  Venta Detalle
     """
+    IMPUESTO_CHOICES = (
+        (5, '5%'),
+        (10, '10%'),
+        (0, 'EXCENTA')
+    )
+    impuesto = models.IntegerField(choices=IMPUESTO_CHOICES, default=10)
     venta = models.ForeignKey(Venta, on_delete=models.PROTECT)
     producto = models.ForeignKey(Producto, on_delete=models.PROTECT)
     cantidad = models.FloatField(verbose_name='Cantidad')
