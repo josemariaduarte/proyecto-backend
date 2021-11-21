@@ -175,3 +175,50 @@ class VentaDetalle(models.Model):
 
     def __str__(self):
         return self.producto
+
+
+class Caja(models.Model):
+    """
+    modelo de Caja
+    """
+    APERTURA = 1
+    CIERRE = 2
+    TIPO_CAJA = (
+        (APERTURA, 'APERTURA'),
+        (CIERRE, 'CIERRE')
+    )
+    fecha = models.DateField(verbose_name='Fecha')
+    monto = models.FloatField(verbose_name='Total', default=0)
+    tipo = models.IntegerField(choices=TIPO_CAJA, default=APERTURA)
+    facturas = models.CharField(verbose_name='Facturas', blank=True, null=True, max_length=255)
+    activo = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['-pk']
+        verbose_name = 'Caja'
+        verbose_name_plural = 'Cajas'
+
+
+class MovimientoCaja(models.Model):
+    """
+       modelo de Movimiento de Caja(es para hacer el calculo de entrada/salida)
+    """
+    COMPRA = 1
+    VENTA = 2
+    APERTURA = 3
+    TIPO_MOVIMIENTO_CHOICES = (
+        (COMPRA, 'COMPRA'),
+        (VENTA, 'VENTA'),
+        (APERTURA, 'APERTURA')
+    )
+    tipo_movimiento = models.IntegerField(verbose_name='Tipo', choices=TIPO_MOVIMIENTO_CHOICES, default=VENTA)
+    compra = models.ForeignKey(Compra, on_delete=models.PROTECT, blank=True, null=True)
+    venta = models.ForeignKey(Venta, on_delete=models.PROTECT, blank=True, null=True)
+    fecha = models.DateField(verbose_name='Fecha')
+    caja = models.ForeignKey(Caja, on_delete=models.PROTECT, blank=True, null=True)
+    cerrado = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-pk']
+        verbose_name = 'Movimiento de Caja'
+        verbose_name_plural = 'Movimientos de Caja'

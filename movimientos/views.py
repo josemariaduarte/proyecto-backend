@@ -2,6 +2,7 @@ from django.db import transaction
 from django.shortcuts import render
 
 # Create your views here.
+from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework import status
@@ -9,9 +10,11 @@ from rest_framework.decorators import detail_route, api_view
 from rest_framework.filters import SearchFilter
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from movimientos.models import OrdenCompra, Compra, OrdenCompraDetalle, CompraDetalle, Venta, VentaDetalle
+from movimientos.models import OrdenCompra, Compra, OrdenCompraDetalle, CompraDetalle, Venta, VentaDetalle, Caja, \
+    MovimientoCaja
 from movimientos.permissions import PermisoOrdenCompra
-from movimientos.serializers import OrdenCompraSerializer, CompraSerializer, VentaSerializer
+from movimientos.serializers import OrdenCompraSerializer, CompraSerializer, VentaSerializer, CajaSerializer, \
+    MovimientoCajaSerializer
 from productos.models import TransaccionProducto
 from utils.messages import Success, Error, Info
 from utils.paginations import GenericPagination
@@ -182,3 +185,103 @@ class VentaViewSet(BaseModelViewSet):
 
 
 
+class CajaViewSet(BaseModelViewSet):
+    """
+    API que permite crear, ver o cajas
+    """
+
+    retrieve_permissions = 'view_venta'
+    list_permissions = 'view_venta'
+    update_permissions = 'change_venta'
+    create_permissions = 'add_venta'
+    destroy_permissions = 'delete_venta'
+    # quitamos activar e inactivar por que no lo vamos a usar de manera momentanea
+    # activate_permissions = [PermisoOrdenCompra.activar_orden_compra.perm]
+    # inactivate_permissions = [PermisoOrdenCompra.inactivar_orden_compra.perm]
+    #
+    queryset = Caja.objects.filter(activo=True)
+    #
+    serializer_class = CajaSerializer
+
+    filter_backends = (SearchFilter, DjangoFilterBackend, OrderingFilter)
+    search_fields = []
+    ordering_fields = ['id']
+    ordering = ['-id']
+    pagination_class = GenericPagination
+
+
+@api_view(['GET'])
+def get_monto_acumulado_dia(request):
+    """
+    endpoint para traer los acumulado en apertura de caja del dia
+    :param request:
+    :return:
+    """
+    from django.db.models import Sum
+    acumulado = MovimientoCaja.objects.filter(fecha=timezone.now().date(), cerrado=False,
+                                              tipo_movimiento=MovimientoCaja.APERTURA).aggregate(Sum('caja__monto'))
+    ventas = MovimientoCaja.objects.filter(fecha=timezone.now().date(), cerrado=False,
+                                           tipo_movimiento=MovimientoCaja.VENTA).aggregate(Sum('venta__total'))
+    compras = MovimientoCaja.objects.filter(fecha=timezone.now().date(), cerrado=False,
+                                            tipo_movimiento=MovimientoCaja.COMPRA).aggregate(Sum('compra__total'))
+    return Response(
+        {
+            "acumulado": (acumulado['caja__monto__sum'] or 0) + (ventas['venta__total__sum'] or 0) - (
+                        compras['compra__total__sum'] or 0)
+        }
+    )
+
+
+class MovimientoCajaViewSet(BaseModelViewSet):
+    """
+    API que permite crear, ver o movimientos de caja
+    """
+
+    retrieve_permissions = 'view_venta'
+    list_permissions = 'view_venta'
+    update_permissions = 'change_venta'
+    create_permissions = 'add_venta'
+    destroy_permissions = 'delete_venta'
+    #
+    queryset = MovimientoCaja.objects.filter(fecha=timezone.now().date(), cerrado=False)
+    #
+    serializer_class = MovimientoCajaSerializer
+
+    filter_backends = (SearchFilter, DjangoFilterBackend, OrderingFilter)
+    search_fields = []
+    ordering_fields = ['id']
+    ordering = ['-id']
+    pagination_class = GenericPagination
+
+
+@api_view(['POST'])
+@transaction.atomic
+def update_movimientos_by_cierre(request):
+    """
+    endpoint para traer los acumulado en apertura de caja del dia
+    :param request:
+    :return:
+    """
+    caja = Caja.objects.create(
+        tipo=Caja.CIERRE,
+        fecha=timezone.now(),
+        monto = 0
+    )
+    total = 0
+    for movimiento in MovimientoCaja.objects.filter(fecha=timezone.now().date(), cerrado=False):
+        movimiento.cerrado = True
+        if movimiento.compra:
+            total -= movimiento.compra.total
+            movimiento.caja = caja
+        elif movimiento.venta:
+            total += movimiento.venta.total
+            movimiento.caja = caja
+        else:
+            total += movimiento.caja.monto
+        #
+        movimiento.save()
+    #
+    caja.monto = total
+    caja.save()
+
+    return Response({"status": "success"}, status=status.HTTP_200_OK)

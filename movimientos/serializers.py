@@ -1,9 +1,12 @@
 from django.db import transaction
 from django.utils import timezone
 from rest_framework import serializers
+from rest_framework.fields import SerializerMethodField
+from rest_framework.serializers import ModelSerializer
 from rest_framework.utils import model_meta
 
-from movimientos.models import OrdenCompra, OrdenCompraDetalle, CompraDetalle, Compra, VentaDetalle, Venta
+from movimientos.models import OrdenCompra, OrdenCompraDetalle, CompraDetalle, Compra, VentaDetalle, Venta, Caja, \
+    MovimientoCaja
 from productos.models import TransaccionProducto, Producto
 from utils.functions import list_diff
 from utils.serializers import BaseModelSerializer
@@ -132,6 +135,12 @@ class CompraSerializer(BaseModelSerializer):
         compra.total_iva10 = iva10
         compra.total_excenta = ivaEx
         compra.save()
+        # CREAMOS EL MOVIMIENTO DE CAJA
+        MovimientoCaja.objects.create(
+            compra=compra,
+            fecha=timezone.now(),
+            tipo_movimiento=MovimientoCaja.COMPRA
+        )
         #
         return compra
 
@@ -299,6 +308,12 @@ class VentaSerializer(BaseModelSerializer):
         venta.total_excenta = ivaEx
         venta.save()
         #
+        MovimientoCaja.objects.create(
+            venta=venta,
+            fecha=timezone.now(),
+            tipo_movimiento=MovimientoCaja.VENTA
+        )
+        #
         return venta
 
 
@@ -387,3 +402,62 @@ class VentaSerializer(BaseModelSerializer):
             producto.cantidad += float(obj.cantidad)
             producto.save()
             obj.delete()
+
+
+class CajaSerializer(BaseModelSerializer):
+    """
+    serializer de caja
+    """
+    table_columns = ['id', 'fecha', 'monto', 'tipo_name']
+    tipo_name = serializers.CharField(source='get_tipo_display', required=False, label='Tipo')
+    fecha = serializers.DateField(required=False)
+
+    class Meta:
+        model = Caja
+        fields = ['id', 'fecha', 'tipo', 'tipo_name', 'monto', 'activo']
+
+    @transaction.atomic
+    def create(self, validated_data):
+        validated_data['fecha'] = timezone.now().date()
+        caja = super(CajaSerializer, self).create(validated_data)
+        ## CREAMOS UN MOVIMIENTO DE CAJA DE APERTURA
+        MovimientoCaja.objects.create(
+            caja=caja,
+            fecha=timezone.now(),
+            tipo_movimiento=MovimientoCaja.APERTURA
+        )
+        return caja
+
+
+class MovimientoCajaSerializer(BaseModelSerializer):
+    """
+    serializer de movimiento de caja
+    """
+
+    table_columns = ['id', 'fecha', 'tipo_name']
+    tipo_name = serializers.CharField(source='get_tipo_movimiento_display', required=False, label='Tipo Movimiento')
+    monto = SerializerMethodField(label='Monto')
+    comprobante = SerializerMethodField(label='Comprobante')
+
+    class Meta:
+        model = MovimientoCaja
+        # fields = ['id', 'fecha', 'tipo_movimiento', 'tipo_name', 'monto', 'comprobante']
+        fields = ('id', 'fecha', 'tipo_movimiento', 'tipo_name', 'monto', 'comprobante')
+
+    def get_monto(self, instance):
+        monto = 0
+        if instance.venta and instance.venta.activo:
+            monto = instance.venta.total
+        elif instance.compra and instance.compra.activo:
+            monto = instance.compra.total
+        elif instance.caja:
+            monto = instance.caja.monto
+        return monto
+
+    def get_comprobante(self, instance):
+        comprobante = "Sin comprobante"
+        if instance.venta and instance.venta.activo:
+            comprobante = instance.venta.numero_comprobante
+        elif instance.compra and instance.compra.activo:
+            comprobante = instance.compra.numero_comprobante
+        return comprobante
