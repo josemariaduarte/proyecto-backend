@@ -69,6 +69,7 @@ class CompraSerializer(BaseModelSerializer):
     """
     detalles = CompraDetalleSerializer(many=True, source='compradetalle_set', required=False)
     proveedor_name = serializers.CharField(source='proveedor.razon_social', required=False)
+    condicion_choices = serializers.CharField(source='get_condicion_display', required=False)
     table_columns = ['fecha']
 
     class Meta:
@@ -85,7 +86,8 @@ class CompraSerializer(BaseModelSerializer):
                   'total_iva5',
                   'total_iva10',
                   'total_excenta',
-                  'activo'
+                  'activo',
+                  'condicion_choices',
                   ]
 
     def producto_actualizar(self, detail):
