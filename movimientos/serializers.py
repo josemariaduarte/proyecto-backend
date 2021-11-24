@@ -242,11 +242,17 @@ class VentaDetalleSerializer(BaseModelSerializer):
     """
     serializer de detalle de venta
     """
+    producto_precio_venta = serializers.CharField(label="Precio", source='producto.precio_venta', required=False)
+    producto_name = serializers.CharField(label="Nombre", source='producto.nombre', required=False)
+    total = serializers.SerializerMethodField(method_name='get_total_calculado')
     table_columns = []
 
     class Meta:
         model = VentaDetalle
-        fields = ['id', 'producto', 'cantidad', 'precio', 'impuesto']
+        fields = ['id', 'producto', 'producto_name', 'producto_precio_venta', 'cantidad', 'precio', 'impuesto', 'total']
+
+    def get_total_calculado(self, instance):
+        return instance.cantidad * instance.precio
 
 
 class VentaSerializer(BaseModelSerializer):
@@ -254,6 +260,10 @@ class VentaSerializer(BaseModelSerializer):
     serializer de ventas
     """
     detalles = VentaDetalleSerializer(many=True, source='ventadetalle_set', required=True)
+    tipo_comprobante_name = serializers.CharField(label="Tipo Comprobante", source='get_tipo_comprobante_display', required=False)
+    cliente_documento = serializers.CharField(label="Documento", source='cliente.nro_doc', required=False)
+    cliente_direccion = serializers.CharField(label="Direccion", source='cliente.direccion', required=False)
+    cliente_telefono = serializers.CharField(label="Telefono", source='cliente.telefono', required=False)
     cliente_name = serializers.ReadOnlyField()
     table_columns = ['fecha']
 
@@ -262,9 +272,15 @@ class VentaSerializer(BaseModelSerializer):
         fields = ['id',
                   'cliente',
                   'cliente_name',
+                  'cliente_documento',
+                  'cliente_direccion',
+                  'cliente_telefono',
                   'tipo_comprobante',
+                  'tipo_comprobante_name',
                   'numero_comprobante',
                   'condicion',
+                  'total_iva5',
+                  'total_iva10',
                   'total',
                   'fecha',
                   'detalles',
