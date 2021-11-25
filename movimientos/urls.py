@@ -12,6 +12,7 @@ router.register(r'compra', CompraViewSet)
 router.register(r'venta', VentaViewSet)
 router.register(r'caja', CajaViewSet)
 router.register(r'movimiento_caja', MovimientoCajaViewSet)
+router.register(r'timbrado', TimbradoViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

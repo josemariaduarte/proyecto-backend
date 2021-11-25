@@ -110,12 +110,19 @@ class Producto(models.Model):
     """
     modelo Producto
     """
+    IMPUESTO_CHOICES = (
+        (5, '5%'),
+        (10, '10%'),
+        (0, 'EXCENTA')
+    )
+
     nombre = models.CharField(verbose_name='Nombre', max_length=100)
     descripcion = models.CharField(verbose_name='Descripción', max_length=100, blank=True, null=True)
     proveedor = models.ForeignKey(Proveedor, on_delete=models.PROTECT)
     fecha_ultima_compra = models.DateTimeField(verbose_name='Fecha Última Compra', blank=True, null=True)
     fecha_modificacion_precio_venta = models.DateTimeField(verbose_name='Fecha Modificación Precio Venta',
                                                            blank=True, null=True)
+    impuesto = models.IntegerField(choices=IMPUESTO_CHOICES, default=10)
     precio_compra = models.FloatField(verbose_name='Precio Compra', default=0)
     precio_venta = models.FloatField(verbose_name='Precio Venta', default=0)
     cantidad = models.FloatField(verbose_name='Cantidad', default=0)

@@ -8,6 +8,25 @@ from personas.models import Proveedor, Cliente
 from productos.models import Producto
 
 
+class Timbrado(models.Model):
+    """
+    modelo timbrado para las ventas
+    """
+    numero = models.CharField('Número', max_length=64)
+    fecha_inicio = models.DateField('Fecha de inicio')
+    fecha_fin = models.DateField('Fecha de finalización')
+    codigo_establecimiento = models.CharField('Código de establecimiento', max_length=32)
+    punto_expedicion = models.CharField('Punto de expedición', max_length=32)
+    cantidad = models.IntegerField()
+    rango_inicio = models.IntegerField()
+    rango_fin = models.IntegerField()
+    secuencia_actual = models.IntegerField()
+    default = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.numero
+
+
 class OrdenCompra(models.Model):
     """
     modelo Orden de Compra
@@ -120,7 +139,8 @@ class Venta(models.Model):
     )
     IMPUESTO_CHOICES = (
         (5, '5%'),
-        (10, '10%')
+        (10, '10%'),
+        (0, 'EXCENTA')
     )
     CONTADO = 1
     CREDITO = 2
@@ -131,6 +151,7 @@ class Venta(models.Model):
     condicion = models.IntegerField(choices=CONDICION_VENTA_CHOICES, default=CONTADO)
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
     tipo_comprobante = models.IntegerField(choices=TIPO_COMPROBANTE_CHOICES, default=FACTURA)
+    timbrado = models.ForeignKey(Timbrado, on_delete=models.PROTECT, blank=True, null=True)
     numero_comprobante = models.CharField(max_length=100, verbose_name='Numero Comprobante', blank=True, null=True)
     fecha = models.DateField(default=timezone.now, verbose_name='Fecha')
     impuesto = models.IntegerField(choices=IMPUESTO_CHOICES, blank=True, null=True)

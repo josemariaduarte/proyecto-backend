@@ -64,6 +64,8 @@ class ProductoSerializer(BaseModelSerializer):
                   'cantidad',
                   'precio_venta',
                   'cantidad_minima_stock',
+                  'porcentaje_ganancia',
+                  'impuesto',
                   'subcategoria',
                   'deposito',
                   'unidad_medida']

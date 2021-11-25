@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from movimientos.models import OrdenCompra, OrdenCompraDetalle, Compra, Venta, VentaDetalle, Caja, MovimientoCaja
+from movimientos.models import OrdenCompra, OrdenCompraDetalle, Compra, Venta, VentaDetalle, Caja, MovimientoCaja, Timbrado
 
 
 class OrdenCompraDetalleInline(admin.TabularInline):
@@ -37,3 +37,8 @@ class CajaAdmin(admin.ModelAdmin):
 @admin.register(MovimientoCaja)
 class MovimientoCajaAdmin(admin.ModelAdmin):
     list_display = ['id', 'fecha', 'tipo_movimiento', 'cerrado']
+
+
+@admin.register(Timbrado)
+class TimbradoAdmin(admin.ModelAdmin):
+    list_display = ['numero', 'fecha_inicio', 'fecha_fin']

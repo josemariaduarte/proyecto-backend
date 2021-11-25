@@ -11,10 +11,10 @@ from rest_framework.filters import SearchFilter
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from movimientos.models import OrdenCompra, Compra, OrdenCompraDetalle, CompraDetalle, Venta, VentaDetalle, Caja, \
-    MovimientoCaja
+    MovimientoCaja, Timbrado
 from movimientos.permissions import PermisoOrdenCompra
 from movimientos.serializers import OrdenCompraSerializer, CompraSerializer, VentaSerializer, CajaSerializer, \
-    MovimientoCajaSerializer
+    MovimientoCajaSerializer, TimbradoSerializer
 from productos.models import TransaccionProducto
 from utils.messages import Success, Error, Info
 from utils.paginations import GenericPagination
@@ -285,3 +285,28 @@ def update_movimientos_by_cierre(request):
     caja.save()
 
     return Response({"status": "success"}, status=status.HTTP_200_OK)
+
+
+class TimbradoViewSet(BaseModelViewSet):
+    """
+    API que permite crear, ver o timbrado
+    """
+
+    retrieve_permissions = 'view_venta'
+    list_permissions = 'view_venta'
+    update_permissions = 'change_venta'
+    create_permissions = 'add_venta'
+    destroy_permissions = 'delete_venta'
+    # quitamos activar e inactivar por que no lo vamos a usar de manera momentanea
+    # activate_permissions = [PermisoOrdenCompra.activar_orden_compra.perm]
+    # inactivate_permissions = [PermisoOrdenCompra.inactivar_orden_compra.perm]
+    #
+    queryset = Timbrado.objects.all()
+    #
+    serializer_class = TimbradoSerializer
+
+    filter_backends = (SearchFilter, DjangoFilterBackend, OrderingFilter)
+    search_fields = []
+    ordering_fields = ['id']
+    ordering = ['-id']
+    pagination_class = GenericPagination

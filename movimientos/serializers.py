@@ -6,7 +6,7 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework.utils import model_meta
 
 from movimientos.models import OrdenCompra, OrdenCompraDetalle, CompraDetalle, Compra, VentaDetalle, Venta, Caja, \
-    MovimientoCaja
+    MovimientoCaja, Timbrado
 from productos.models import TransaccionProducto, Producto
 from utils.functions import list_diff
 from utils.serializers import BaseModelSerializer
@@ -275,12 +275,14 @@ class VentaSerializer(BaseModelSerializer):
                   'cliente_documento',
                   'cliente_direccion',
                   'cliente_telefono',
+                  'timbrado',
                   'tipo_comprobante',
                   'tipo_comprobante_name',
                   'numero_comprobante',
                   'condicion',
                   'total_iva5',
                   'total_iva10',
+                  'total_excenta',
                   'total',
                   'fecha',
                   'detalles',
@@ -319,6 +321,10 @@ class VentaSerializer(BaseModelSerializer):
                 iva5 += ((detalle.get('cantidad') * detalle.get('precio')) * (5 / 100))
             else:
                 ivaEx += (detalle.get('cantidad') * detalle.get('precio'))
+        # TODO: SE UTILIZA SOLO EL PRIMERO MIENTRAS, ACTUALIZAMOS LA SECUENCIA PARA LA SIGUIENTE FACTURA.
+        timbrado = Timbrado.objects.first()
+        timbrado.secuencia_actual += 1
+        timbrado.save()
         #
         venta.total = monto
         venta.total_iva5 = iva5
@@ -479,3 +485,25 @@ class MovimientoCajaSerializer(BaseModelSerializer):
         elif instance.compra and instance.compra.activo:
             comprobante = instance.compra.numero_comprobante
         return comprobante
+
+
+class TimbradoSerializer(BaseModelSerializer):
+    """
+    serializer de caja
+    """
+    table_columns = ['id', 'fecha_inicio']
+
+    class Meta:
+        model = Timbrado
+        fields = [
+            'id',
+            'numero',
+            'fecha_inicio',
+            'fecha_fin',
+            'codigo_establecimiento',
+            'punto_expedicion',
+            'cantidad',
+            'rango_inicio',
+            'rango_fin',
+            'secuencia_actual',
+        ]
