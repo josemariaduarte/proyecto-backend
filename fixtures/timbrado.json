@@ -1,0 +1,1 @@
+[{"model": "movimientos.timbrado", "pk": 1, "fields": {"numero": "148867896", "fecha_inicio": "2021-01-01", "fecha_fin": "2021-12-31", "codigo_establecimiento": "001", "punto_expedicion": "001", "cantidad": 100, "rango_inicio": 1, "rango_fin": 100, "secuencia_actual": 1, "default": true}}]
