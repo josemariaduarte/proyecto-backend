@@ -56,11 +56,12 @@ class CompraDetalleSerializer(BaseModelSerializer):
     """
     serializer de detalle de compra
     """
+    producto_name = serializers.CharField(label="Nombre", source='producto.nombre', required=False)
     table_columns = []
 
     class Meta:
         model = CompraDetalle
-        fields = ['id', 'producto', 'cantidad', 'precio', 'impuesto']
+        fields = ['id', 'producto', 'producto_name', 'cantidad', 'precio', 'impuesto']
 
 
 class CompraSerializer(BaseModelSerializer):
@@ -68,7 +69,12 @@ class CompraSerializer(BaseModelSerializer):
     serializer de orden de compra
     """
     detalles = CompraDetalleSerializer(many=True, source='compradetalle_set', required=False)
+    tipo_comprobante_name = serializers.CharField(label="Tipo Comprobante", source='get_tipo_comprobante_display',
+                                                  required=False)
+
     proveedor_name = serializers.CharField(source='proveedor.razon_social', required=False)
+    proveedor_ruc = serializers.CharField(label="Documento", source='proveedor.ruc', required=False)
+    proveedor_direccion = serializers.CharField(label="Direccion", source='proveedor.direccion', required=False)
     condicion_choices = serializers.CharField(source='get_condicion_display', required=False)
     table_columns = ['fecha']
 
@@ -77,7 +83,10 @@ class CompraSerializer(BaseModelSerializer):
         fields = ['id',
                   'proveedor',
                   'proveedor_name',
+                  'proveedor_ruc',
+                  'proveedor_direccion',
                   'tipo_comprobante',
+                  'tipo_comprobante_name',
                   'numero_comprobante',
                   'condicion',
                   'total',
